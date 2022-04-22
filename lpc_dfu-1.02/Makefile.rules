@@ -1,0 +1,98 @@
+#
+# $Id: Makefile.rules,v 1.3 2013/09/17 15:22:05 claudio Exp $
+#
+# List of all source files without directory and file-extension. (non toccare)
+SRCBASE = $(notdir $(basename $(SOURCE)))
+
+# List of all objects files. (aggiungiamo il percorso di output) (non toccare)
+OBJS = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(SRCBASE)))
+
+# Define Messages.
+MSG_BEGIN = -------- begin --------
+MSG_END = --------  end  --------
+
+# Generate dependency information (non toccare)
+CFLAGS += -MD -MP -MF .dep$(OUTDIR)/$(@F).d
+
+
+# Rules definition (non toccare) ***********************************************************
+
+all: $(DEFAULT_MAKE_TARGET)
+
+bin: $(PRJ_TARGET).bin $(PRJ_TARGET)-extflash.bin $(PRJ_TARGET)-appflash.bin
+
+hex: $(PRJ_TARGET).hex $(PRJ_TARGET)-extflash.hex
+
+#lib: $(ECLIB_TARGET)
+
+zip: $(PRJ_TARGET).zip
+
+# NB non invocare direttamente ld, ma il frontend gcc
+$(PRJ_TARGET_EXT): $(OBJS) Makefile
+	@echo "Linking..."
+	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
+
+$(PRJ_TARGET).hex: $(PRJ_TARGET_EXT)
+	$(OBJCOPY) -O ihex -R .external_flash $< $@
+
+$(PRJ_TARGET)-extflash.hex: $(PRJ_TARGET_EXT)
+	$(OBJCOPY) -O ihex -j .external_flash $< $@
+
+$(PRJ_TARGET).bin: $(PRJ_TARGET_EXT)
+	$(OBJCOPY) -O binary -R .external_flash -R .apptext $< $@
+
+$(PRJ_TARGET)-extflash.bin: $(PRJ_TARGET_EXT)
+	$(OBJCOPY) -O binary -j .external_flash $< $@
+
+$(PRJ_TARGET)-appflash.bin: $(PRJ_TARGET_EXT)
+	$(OBJCOPY) -O binary -R .external_flash $< $@
+
+$(PRJ_TARGET).dmp: $(PRJ_TARGET_EXT)
+	$(OBJDUMP) -x --syms $< > $@
+
+$(PRJ_TARGET).zip: $(PRJ_TARGET_EXT)
+	$(RM) -f $@
+	$(SEVENZ) a -bd -tzip $@ $(PRJ_TARGET_EXT)
+
+#	if ! cmp $(PRJ_TARGET).bin $(PRJ_TARGET)-appflash.bin; then $(SEVENZ) a -bd -tzip $@ $(PRJ_TARGET)-appflash.bin; fi
+
+# Compile: create object files from C source files.
+define COMPILE_C_TEMPLATE
+$(OUTDIR)/$(notdir $(basename $(1))).o : $(1) Makefile
+	@echo $$< "->" $$@
+	$(CC) -c  $$(CFLAGS) $$< -o $$@
+endef
+$(foreach src, $(SOURCE), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
+
+clean :
+	$(RM) -f $(OUTDIR)/*.o
+	$(RM) -f $(OUTDIR)/*.lst
+	$(RM) -rf .dep$(OUTDIR)
+
+#N.B. Il file version.c viene cancellato, ripreso da CVS e sostituito il correto time stamp ad ogni build
+#buildversion:
+#	$(SCRIPTS_DIR)/build_version.sh version.c src
+
+# Eye candy.
+begin:
+	@echo $(MSG_BEGIN)
+
+end:
+	@echo $(MSG_END)
+
+# Display compiler version information.
+gccversion :
+	@$(CC) --version
+
+# Creiamo le dir di output e file .cvsignore dentro di esse
+$(shell mkdir -p $(OUTDIR) 2>/dev/null)
+$(shell echo -e "*.lst\n*.o\n*.bin\n*.dmp\n*.elf\n*.map\n*.exe\n*.zip\n.cvsignore" > $(OUTDIR)/.cvsignore)
+
+#
+# Include the dependency files, should be the last of the makefile
+#
+-include $(shell mkdir -p .dep$(OUTDIR) 2>/dev/null) $(wildcard .dep$(OUTDIR)/*)
+
+$(shell echo -e "*.d\n.cvsignore" >.dep$(OUTDIR)/.cvsignore)
+
+# *** EOF ***

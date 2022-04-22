@@ -1,0 +1,29 @@
+/*
+ * $Id: errorcodes.h,v 1.1 2013/09/10 15:53:18 claudio Exp $
+ */
+
+#ifndef ERRORCODES_H_INC
+#define ERRORCODES_H_INC
+
+#define ERRCODE(x)	(-(x))
+
+typedef enum {
+	ERR_OK = 0,
+	ERR_BADPARAM = 100,
+	ERR_FILEOPEN,
+	ERR_FILEREAD,
+	ERR_FILEWRITE,
+	ERR_DFUUPLOAD,
+	ERR_DFUDOWNLOAD,
+	ERR_DFUGETSTATUS,
+	ERR_DFUDEVBUSY,
+	ERR_DFUBADSTATUS,
+	ERR_DFUBADSTATE,
+	ERR_TIMEOUT,
+} ERRCODE_T;
+
+#ifndef OK
+#define OK	ERR_OK
+#endif
+
+#endif /* ERRORCODES_H_ */

@@ -1,0 +1,9 @@
+*.lst
+*.o
+*.bin
+*.dmp
+*.elf
+*.map
+*.exe
+*.zip
+.cvsignore

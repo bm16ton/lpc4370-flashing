@@ -1,0 +1,8 @@
+#!/bin/bash
+cp $1 temp.bin
+python3 /usr/local/bin/dfu.py temp.bin
+cat _header.bin temp.bin > new-firware.bin.hdr
+rm temp.bin _header.bin 
+echo "New firmware should be in curret directory named new-firware.bin.hdr"
+
+

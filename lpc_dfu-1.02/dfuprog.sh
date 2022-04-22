@@ -3,8 +3,6 @@
 
 #set -o verbose
 
-cp /usr/local/bin/iram_dfu_util_spiflash.bin.hdr ./
-
 if [ "z$1" == "z" ]; then
 	echo "Missing argument: file to program"
 	exit 1
@@ -68,7 +66,6 @@ fi
 if [ -f readback.bin ]; then
 	if cmp readback.bin "${FILENAME}"; then
 		echo "Verify OK"
-		rm ./command_log.txt ./iram_dfu_util_spiflash.bin.hdr ./lpcdfu_log.txt ./readback.bin
 		exit 0
 	else
 		echo "file readback.bin and ${FILENAME} differs"
@@ -76,5 +73,4 @@ if [ -f readback.bin ]; then
 else
 	echo "readback.bin not found!!"
 fi
-rm command_log.txt iram_dfu_util_spiflash.bin.hdr lpcdfu_log.txt readback.bin
 exit 1

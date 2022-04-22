@@ -31,4 +31,3 @@ UPDATE: added lpc-add-vectortbl-2-frmware which adds the crc required to the fir
 and lpc-dfu-header to add the required dfu header for ram only upload, after header firmware file is created all that is needed is "dfu-util -D firmwarefile"
 and added my awesome pinout, im so good at making those I should get paid (note the sarcasm)
 
-The scripts where taken from hackrf/greatfet source and the best version of dfu-util to use so far ive found is 0.9

@@ -1,0 +1,8 @@
+ACTION!="add|change", GOTO="dfuutil_rules_end"
+SUBSYSTEM!="usb", GOTO="dfuutil_rules_end"
+ENV{DEVTYPE}!="usb_device", GOTO="dfuutil_rules_end"
+
+# LPC18xx DFU Bootmonitor
+ATTRS{idVendor}=="1fc9", ATTRS{idProduct}=="000c", MODE="660", GROUP="plugdev"
+
+LABEL="dfuutil_rules_end"
